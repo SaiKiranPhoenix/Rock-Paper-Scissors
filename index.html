@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock, Paper, Scissors</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #2f80ed, #56ccf2);
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .game-container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .score {
+            font-size: 1.2rem;
+        }
+
+        #round-info {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .choices {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .choice {
+            font-size: 1rem;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #fff;
+            color: #000;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .choice:hover {
+            transform: scale(1.1);
+        }
+
+        #result {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        #reset {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: red;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none; /* Hidden initially */
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .choice {
+                font-size: 0.9rem;
+                padding: 8px 16px;
+            }
+
+            #result {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Rock, Paper, Scissors</h1>
+        <div class="scoreboard">
+            <div class="score">Player: <span id="player-score">0</span></div>
+            <div class="score">Computer: <span id="computer-score">0</span></div>
+        </div>
+        <div id="round-info">Round: <span id="round-number">1</span> of 10</div>
+        <div class="choices">
+            <button class="choice" data-choice="rock">✊ Rock</button>
+            <button class="choice" data-choice="paper">✋ Paper</button>
+            <button class="choice" data-choice="scissors">✌️ Scissors</button>
+        </div>
+        <div id="result">Make your move!</div>
+        <button id="reset">Restart Game</button>
+    </div>
+    <script>
+        let playerScore = 0;
+        let computerScore = 0;
+        let roundNumber = 1;
+
+        const playerScoreElem = document.getElementById("player-score");
+        const computerScoreElem = document.getElementById("computer-score");
+        const roundInfoElem = document.getElementById("round-number");
+        const resultElem = document.getElementById("result");
+        const resetButton = document.getElementById("reset");
+
+        document.querySelectorAll(".choice").forEach(button => {
+            button.addEventListener("click", () => playRound(button.dataset.choice));
+        });
+
+        resetButton.addEventListener("click", resetGame);
+
+        function playRound(playerChoice) {
+            if (roundNumber > 10) return;
+
+            const computerChoice = getComputerChoice();
+            const winner = getWinner(playerChoice, computerChoice);
+
+            if (winner === "player") {
+                playerScore++;
+                resultElem.textContent = `You win! ${capitalize(playerChoice)} beats ${capitalize(computerChoice)}.`;
+            } else if (winner === "computer") {
+                computerScore++;
+                resultElem.textContent = `You lose! ${capitalize(computerChoice)} beats ${capitalize(playerChoice)}.`;
+            } else {
+                resultElem.textContent = `It's a draw! Both chose ${capitalize(playerChoice)}.`;
+            }
+
+            updateScoreboard();
+            roundNumber++;
+
+            if (roundNumber > 10) {
+                declareWinner();
+                resetButton.style.display = "block";
+            }
+        }
+
+        function getComputerChoice() {
+            const choices = ["rock", "paper", "scissors"];
+            return choices[Math.floor(Math.random() * 3)];
+        }
+
+        function getWinner(player, computer) {
+            if (player === computer) return "draw";
+            if (
+                (player === "rock" && computer === "scissors") ||
+                (player === "paper" && computer === "rock") ||
+                (player === "scissors" && computer === "paper")
+            ) {
+                return "player";
+            }
+            return "computer";
+        }
+
+        function updateScoreboard() {
+            playerScoreElem.textContent = playerScore;
+            computerScoreElem.textContent = computerScore;
+            roundInfoElem.textContent = roundNumber;
+        }
+
+        function declareWinner() {
+            if (playerScore > computerScore) {
+                resultElem.textContent = "Game Over: You are the champion!";
+            } else if (computerScore > playerScore) {
+                resultElem.textContent = "Game Over: Computer wins!";
+            } else {
+                resultElem.textContent = "Game Over: It's a tie!";
+            }
+        }
+
+        function resetGame() {
+            playerScore = 0;
+            computerScore = 0;
+            roundNumber = 1;
+            updateScoreboard();
+            resultElem.textContent = "Make your move!";
+            resetButton.style.display = "none";
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+    </script>
+</body>
+</html>
